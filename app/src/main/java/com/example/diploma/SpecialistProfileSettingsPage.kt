@@ -57,7 +57,6 @@ import coil.request.ImageRequest
 import com.google.gson.JsonElement
 import com.example.diploma.data.remote.ApiClient
 import com.example.diploma.data.remote.ChangePasswordRequest
-import com.example.diploma.data.remote.SpecialistSettingsUpdateRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -245,6 +244,8 @@ fun SpecialistProfileSettingsPage(navController: NavController) {
             email = s.email
             about = s.approach_description.orEmpty()
             avatarUrl = resolveCourseImageUrl(s.avatar)
+            // Prefer backend avatar after page reopen; stale content:// URIs may be invalid.
+            selectedAvatarUri = null
             specializations = mapSpecializationsFromResponse(s.specializations)
             val years = extractIntFromFlexibleField(s.years_experience)
             rawExperienceYears = years
@@ -404,22 +405,28 @@ fun SpecialistProfileSettingsPage(navController: NavController) {
                         val tzApi = timeZoneUiToApi(timezone)
                         val ageApi = sanitizeAgeRangeForApi(ageRange)
 
-                        val body = SpecialistSettingsUpdateRequest(
-                            full_name = fullName.trim().ifBlank { null },
-                            approach_description = about.trim().ifBlank { null },
-                            specializations = listOf(specCode),
-                            years_experience = yearsInt,
-                            methods = listOf(methodCode),
-                            age_range = ageApi.ifBlank { null },
-                            work_format = workFormat.ifBlank { null },
-                            time_zone = tzApi.ifBlank { null },
-                            city = city.trim().ifBlank { null }
-                        )
-
                         val result = withContext(Dispatchers.IO) {
                             runCatching {
+                                val avatarPart = selectedAvatarUri
+                                    ?.takeIf { it.isNotBlank() }
+                                    ?.let { uriStr ->
+                                        buildAvatarPartFromUri(context, Uri.parse(uriStr))
+                                            ?: throw IllegalStateException("Не удалось подготовить изображение")
+                                    }
                                 val response = ApiClient.withNetworkRetry {
-                                    ApiClient.api.updateSpecialistSettings(body)
+                                    ApiClient.api.updateSpecialistSettingsMultipart(
+                                        fullName = textPart(fullName.trim()),
+                                        approachDescription = textPart(about.trim()),
+                                        // Массивы отправляем JSON-строкой, как требует swagger для multipart PUT.
+                                        specializations = textPart("[\"$specCode\"]"),
+                                        yearsExperience = textPart(yearsInt.toString()),
+                                        methods = textPart("[\"$methodCode\"]"),
+                                        ageRange = textPart(ageApi),
+                                        workFormat = textPart(workFormat),
+                                        timeZone = textPart(tzApi),
+                                        city = textPart(city.trim()),
+                                        avatar = avatarPart
+                                    )
                                 }
                                 if (!response.isSuccessful) {
                                     val err = runCatching { response.errorBody()?.string() }.getOrNull()
@@ -428,6 +435,10 @@ fun SpecialistProfileSettingsPage(navController: NavController) {
                                             ?: "Ошибка: ${response.code()}"
                                     )
                                 }
+                                response.body()?.avatar?.let { newAvatar ->
+                                    avatarUrl = resolveCourseImageUrl(newAvatar) ?: avatarUrl
+                                }
+                                selectedAvatarUri = null
                             }
                         }
 
@@ -435,32 +446,6 @@ fun SpecialistProfileSettingsPage(navController: NavController) {
                             saveMessage = result.exceptionOrNull()?.message
                                 ?: "Не удалось сохранить"
                             return@launch
-                        }
-
-                        if (!selectedAvatarUri.isNullOrBlank()) {
-                            val avatarResult = withContext(Dispatchers.IO) {
-                                runCatching {
-                                    val part = buildAvatarPartFromUri(
-                                        context = context,
-                                        uri = Uri.parse(selectedAvatarUri!!)
-                                    ) ?: throw IllegalStateException("Не удалось подготовить изображение")
-                                    val response = ApiClient.withNetworkRetry {
-                                        ApiClient.api.putSpecialistSettingsAvatar(part)
-                                    }
-                                    if (!response.isSuccessful) {
-                                        val err = runCatching { response.errorBody()?.string() }.getOrNull()
-                                        throw IllegalStateException(
-                                            err?.takeIf { it.isNotBlank() }
-                                                ?: "Загрузка изображения: ${response.code()}"
-                                        )
-                                    }
-                                    avatarUrl = response.body()?.avatar ?: avatarUrl
-                                }
-                            }
-                            if (avatarResult.isFailure) {
-                                saveMessage = avatarResult.exceptionOrNull()?.message ?: "Не удалось загрузить изображение"
-                                return@launch
-                            }
                         }
 
                         if (passFilled) {
@@ -701,9 +686,13 @@ private fun AvatarUploadSection(
             .clickable { onPickImage() },
         contentAlignment = Alignment.Center
     ) {
+        val hasLocalUri = !imageUri.isNullOrBlank()
+        val hasRemoteUrl = !imageUrl.isNullOrBlank()
+        var fallbackToRemote by remember(imageUri, imageUrl) { mutableStateOf(false) }
         val previewModel: Any? = when {
-            !imageUri.isNullOrBlank() -> Uri.parse(imageUri)
-            !imageUrl.isNullOrBlank() -> imageUrl
+            hasLocalUri && !fallbackToRemote -> Uri.parse(imageUri)
+            hasRemoteUrl -> imageUrl
+            hasLocalUri -> Uri.parse(imageUri)
             else -> null
         }
         if (previewModel == null) {
@@ -717,7 +706,12 @@ private fun AvatarUploadSection(
                 model = ImageRequest.Builder(LocalContext.current).data(previewModel).crossfade(true).build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                onError = {
+                    if (hasLocalUri && hasRemoteUrl && !fallbackToRemote) {
+                        fallbackToRemote = true
+                    }
+                }
             )
         }
     }
@@ -748,6 +742,12 @@ private fun buildAvatarPartFromUri(
     val body = bytes.toRequestBody(mime.toMediaTypeOrNull())
     return MultipartBody.Part.createFormData("avatar", name, body)
 }
+
+/**
+ * Превращает строку в multipart-поле. Пустую строку не шлём, чтобы бэк не затирал поле.
+ */
+private fun textPart(value: String): okhttp3.RequestBody? =
+    value.takeIf { it.isNotEmpty() }?.toRequestBody("text/plain".toMediaTypeOrNull())
 
 @Composable
 private fun FormatToggle(current: String, onSelect: (String) -> Unit) {

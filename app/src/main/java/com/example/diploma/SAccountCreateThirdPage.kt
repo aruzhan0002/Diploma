@@ -16,23 +16,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.diploma.ui.auth.SpecialistViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SAccountCreateThirdPage(navController: NavController) {
-
+fun SAccountCreateThirdPage(
+    navController: NavController,
+    specialistVm: SpecialistViewModel
+) {
     val blue = Color(0xFF006FFD)
     val borderColor = Color(0xFFC5C6CC)
     val selectedBg = Color(0xFFEAF2FF)
     val radius = RoundedCornerShape(16.dp)
-
-    var selected by remember { mutableStateOf("ABA-терапия") }
-    var otherText by remember { mutableStateOf("") }
 
     val options = listOf(
         "🧩 ABA-терапия",
@@ -58,7 +56,6 @@ fun SAccountCreateThirdPage(navController: NavController) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
-                    // чтобы контент не залезал под кнопки
                     .padding(bottom = 140.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -83,7 +80,6 @@ fun SAccountCreateThirdPage(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // список выбора
                 Column(
                     modifier = Modifier
                         .width(327.dp)
@@ -103,7 +99,7 @@ fun SAccountCreateThirdPage(navController: NavController) {
                             .replace("🧸 ", "")
                             .replace("📚 ", "")
 
-                        val isSelected = (clean == selected)
+                        val isSelected = (clean == specialistVm.specialization)
 
                         Row(
                             modifier = Modifier
@@ -111,7 +107,7 @@ fun SAccountCreateThirdPage(navController: NavController) {
                                 .height(52.dp)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(if (isSelected) selectedBg else Color.White)
-                                .clickable { selected = clean }
+                                .clickable { specialistVm.specialization = clean }
                                 .padding(horizontal = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -141,7 +137,6 @@ fun SAccountCreateThirdPage(navController: NavController) {
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Другое (большое поле)
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -153,10 +148,10 @@ fun SAccountCreateThirdPage(navController: NavController) {
                         Box(Modifier.fillMaxSize()) {
 
                             OutlinedTextField(
-                                value = otherText,
+                                value = specialistVm.specializationOther,
                                 onValueChange = {
-                                    otherText = it
-                                    selected = "Другое"
+                                    specialistVm.specializationOther = it
+                                    specialistVm.specialization = "Другое"
                                 },
                                 placeholder = { Text("Другое", color = Color(0xFF9AA0A6)) },
                                 modifier = Modifier.fillMaxSize(),
@@ -170,7 +165,7 @@ fun SAccountCreateThirdPage(navController: NavController) {
                                 )
                             )
 
-                            if (selected == "Другое") {
+                            if (specialistVm.specialization == "Другое") {
                                 Icon(
                                     imageVector = Icons.Filled.Check,
                                     contentDescription = null,
@@ -194,9 +189,7 @@ fun SAccountCreateThirdPage(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(
-                    onClick = {
-
-                        navController.navigate("SAccountCreateFourthPage") }, // поменяй маршрут как у тебя
+                    onClick = { navController.navigate("SAccountCreateFourthPage") },
                     modifier = Modifier
                         .width(327.dp)
                         .height(45.dp),
@@ -222,10 +215,4 @@ fun SAccountCreateThirdPage(navController: NavController) {
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSAccountCreateThirdPage() {
-    SAccountCreateThirdPage(navController = rememberNavController())
 }

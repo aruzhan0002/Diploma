@@ -2,7 +2,6 @@ package com.example.diploma
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,28 +13,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.diploma.R
+import com.example.diploma.ui.auth.SpecialistViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SAccountCreateFirstPage(navController: NavController) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var isPasswordVisible by remember { mutableStateOf(false) }
+fun SAccountCreateFirstPage(
+    navController: NavController,
+    specialistVm: SpecialistViewModel
+) {
+    var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
     var isChecked by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val blue = Color(0xFF006FFD)
 
@@ -67,31 +65,44 @@ fun SAccountCreateFirstPage(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(15.dp))
 
-                // Ваша почта
+                if (errorMessage != null) {
+                    Text(
+                        text = errorMessage!!,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .width(327.dp)
+                            .padding(vertical = 8.dp)
+                    )
+                }
+
                 Text(
                     text = "Ваша почта",
                     style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Normal),
                     modifier = Modifier
                         .width(327.dp)
                         .height(20.dp)
-
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(
-                    value = email,
-                    onValueChange = { email = it },
+                    value = specialistVm.email,
+                    onValueChange = {
+                        specialistVm.email = it
+                        errorMessage = null
+                    },
                     label = { Text("name@email.com") },
                     modifier = Modifier
                         .width(327.dp)
-                        .height(50.dp)
+                        .defaultMinSize(minHeight = 56.dp)
                         .border(1.dp, Color(0xFFC5C6CC), RoundedCornerShape(12.dp)),
                     textStyle = TextStyle(fontSize = 16.sp),
                     singleLine = true,
+                    enabled = !isLoading,
                     shape = RoundedCornerShape(12.dp),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.White,
                         unfocusedContainerColor = Color.White,
-                        disabledContainerColor = Color.White,
+                        disabledContainerColor = Color.White.copy(alpha = 0.5f),
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent,
@@ -100,7 +111,6 @@ fun SAccountCreateFirstPage(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(15.dp))
 
-                // Создайте пароль
                 Text(
                     text = "Создайте пароль",
                     style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Normal),
@@ -110,30 +120,37 @@ fun SAccountCreateFirstPage(navController: NavController) {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = specialistVm.password,
+                    onValueChange = {
+                        specialistVm.password = it
+                        errorMessage = null
+                    },
                     label = { Text("Пароль") },
-                    visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
-                        IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
-                                painter = painterResource(id = R.drawable.img3),
-                                contentDescription = "Toggle password visibility",
-                                modifier = Modifier.size(16.dp)
+                                painter = painterResource(
+                                    id = if (passwordVisible) R.drawable.ic_password_show else R.drawable.ic_password_hide
+                                ),
+                                contentDescription = if (passwordVisible) "Скрыть пароль" else "Показать пароль",
+                                modifier = Modifier.size(20.dp),
+                                tint = Color.Unspecified
                             )
                         }
                     },
                     modifier = Modifier
                         .width(327.dp)
-                        .height(48.dp)
+                        .defaultMinSize(minHeight = 56.dp)
                         .border(1.dp, Color(0xFFC5C6CC), RoundedCornerShape(12.dp)),
                     textStyle = TextStyle(fontSize = 16.sp),
                     singleLine = true,
+                    enabled = !isLoading,
                     shape = RoundedCornerShape(12.dp),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.White,
                         unfocusedContainerColor = Color.White,
-                        disabledContainerColor = Color.White,
+                        disabledContainerColor = Color.White.copy(alpha = 0.5f),
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent,
@@ -142,7 +159,6 @@ fun SAccountCreateFirstPage(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(15.dp))
 
-                // Подтвердите пароль
                 Text(
                     text = "Подтвердите пароль",
                     style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Normal),
@@ -152,30 +168,37 @@ fun SAccountCreateFirstPage(navController: NavController) {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(
-                    value = confirmPassword,
-                    onValueChange = { confirmPassword = it },
+                    value = specialistVm.confirmPassword,
+                    onValueChange = {
+                        specialistVm.confirmPassword = it
+                        errorMessage = null
+                    },
                     label = { Text("Подтвердите пароль") },
-                    visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
-                        IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                        IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
                             Icon(
-                                painter = painterResource(id = R.drawable.img3),
-                                contentDescription = "Toggle password visibility",
-                                modifier = Modifier.size(16.dp)
+                                painter = painterResource(
+                                    id = if (confirmPasswordVisible) R.drawable.ic_password_show else R.drawable.ic_password_hide
+                                ),
+                                contentDescription = if (confirmPasswordVisible) "Скрыть пароль" else "Показать пароль",
+                                modifier = Modifier.size(20.dp),
+                                tint = Color.Unspecified
                             )
                         }
                     },
                     modifier = Modifier
                         .width(327.dp)
-                        .height(48.dp)
+                        .defaultMinSize(minHeight = 56.dp)
                         .border(1.dp, Color(0xFFC5C6CC), RoundedCornerShape(12.dp)),
                     textStyle = TextStyle(fontSize = 16.sp),
                     singleLine = true,
+                    enabled = !isLoading,
                     shape = RoundedCornerShape(12.dp),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.White,
                         unfocusedContainerColor = Color.White,
-                        disabledContainerColor = Color.White,
+                        disabledContainerColor = Color.White.copy(alpha = 0.5f),
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent,
@@ -184,14 +207,14 @@ fun SAccountCreateFirstPage(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // чекбокс
                 Row(
                     modifier = Modifier.width(327.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Checkbox(
                         checked = isChecked,
-                        onCheckedChange = { isChecked = it }
+                        onCheckedChange = { isChecked = it },
+                        enabled = !isLoading
                     )
                     Text(
                         text = "Я ознакомился(-ась) с ТП Правами и Условиями и Политикой безопасности.",
@@ -203,7 +226,6 @@ fun SAccountCreateFirstPage(navController: NavController) {
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            // ✅ КНОПКИ — ВСЕГДА СНИЗУ
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -214,17 +236,49 @@ fun SAccountCreateFirstPage(navController: NavController) {
             ) {
                 Button(
                     onClick = {
-                        if (isChecked) {
-                            navController.navigate("SAccountCreateSecondPage")
+                        if (specialistVm.password != specialistVm.confirmPassword) {
+                            errorMessage = "Пароли не совпадают"
+                            return@Button
                         }
+                        if (!isChecked) {
+                            errorMessage = "Необходимо согласиться с условиями"
+                            return@Button
+                        }
+                        isLoading = true
+                        errorMessage = null
+                        specialistVm.register(
+                            onSuccess = {
+                                isLoading = false
+                                navController.navigate("SAccountCreateSecondPage")
+                            },
+                            onError = { error ->
+                                isLoading = false
+                                errorMessage = error
+                            }
+                        )
                     },
                     modifier = Modifier
                         .width(327.dp)
                         .height(45.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = blue)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = blue,
+                        disabledContainerColor = blue.copy(alpha = 0.5f)
+                    ),
+                    enabled = !isLoading &&
+                            specialistVm.email.isNotBlank() &&
+                            specialistVm.password.isNotBlank() &&
+                            specialistVm.confirmPassword.isNotBlank() &&
+                            isChecked
                 ) {
-                    Text(text = "Далее", color = Color.White)
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    } else {
+                        Text(text = "Далее", color = Color.White)
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -236,7 +290,8 @@ fun SAccountCreateFirstPage(navController: NavController) {
                         .height(45.dp),
                     shape = RoundedCornerShape(12.dp),
                     border = androidx.compose.foundation.BorderStroke(1.dp, blue),
-                    colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
+                    colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White),
+                    enabled = !isLoading
                 ) {
                     Text(text = "Назад", color = blue)
                 }
@@ -253,28 +308,16 @@ fun StepProgressBar1(currentStep: Int) {
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Create 9 steps
         for (i in 1..7) {
             Box(
-                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .width(43.dp) // Размер по ширине
-                    .height(8.dp)  // Высота каждого индикатора
-                    .clip(RoundedCornerShape(4.dp)) // Закругление углов
+                    .width(43.dp)
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(4.dp))
                     .background(
                         color = if (i <= currentStep) Color.Blue else Color(0xFFE8E9F1)
                     )
-            ) {
-                // Отображение в каждом Box, если нужно, можно добавить контент
-            }
+            )
         }
     }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSAccountCreateFirstPage() {
-    SAccountCreateFirstPage(navController = rememberNavController())
 }

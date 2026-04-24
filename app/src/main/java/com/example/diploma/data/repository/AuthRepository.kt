@@ -9,7 +9,7 @@ class AuthRepository(
         api.register(RegisterRequest(email = email, password = pass, password_confirm = pass2))
 
     suspend fun login(email: String, pass: String) =
-        api.login(LoginRequest(username = email, password = pass))
+        api.login(LoginRequest(email = email, password = pass))
 
     suspend fun refresh(refreshToken: String) =
         api.refresh(RefreshRequest(refresh = refreshToken))

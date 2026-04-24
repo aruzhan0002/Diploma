@@ -6,6 +6,7 @@ import com.example.diploma.data.remote.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class ChildViewModel : ViewModel() {
     init {
@@ -27,6 +28,23 @@ class ChildViewModel : ViewModel() {
         comfortable_duration = "5_min"
     ))
     val childData = _childData.asStateFlow()
+
+    private fun parseApiError(rawBody: String?, fallback: String): String {
+        if (rawBody.isNullOrBlank()) return fallback
+        return runCatching {
+            val obj = JSONObject(rawBody)
+            when {
+                obj.has("detail") -> obj.optString("detail")
+                obj.has("message") -> obj.optString("message")
+                else -> fallback
+            }.ifBlank { fallback }
+        }.getOrDefault(fallback)
+    }
+
+    private fun looksLikeAlreadyCreated(rawBody: String?): Boolean {
+        val text = rawBody.orEmpty().lowercase()
+        return text.contains("уже") || text.contains("already") || text.contains("exists")
+    }
 
     // Экран 3: имя и возраст
     fun updateChildInfo(name: String, age: Int) {
@@ -90,16 +108,39 @@ class ChildViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
-                val response = ApiClient.api.createChildProfile(_childData.value)
+                val request = _childData.value
+                val response = ApiClient.api.createChildProfile(request)
                 if (response.isSuccessful) {
                     // Если нужно, можно получить данные из response.body()
                     val profileResponse = response.body()
                     println("Профиль ребенка создан: $profileResponse")
                     onSuccess()
                 } else {
-                    // Получаем текст ошибки из response.errorBody()
                     val errorBody = response.errorBody()?.string()
-                    onError("Ошибка ${response.code()}: $errorBody")
+                    val alreadyCreated = (response.code() == 400 || response.code() == 409) &&
+                        looksLikeAlreadyCreated(errorBody)
+                    if (alreadyCreated) {
+                        val childId = ApiClient.api.getChildren().firstOrNull()?.id
+                        if (childId == null) {
+                            onError("Профиль ребенка уже существует, но id не найден для обновления")
+                            return@launch
+                        }
+                        val patchResp = ApiClient.api.patchChildProfile(childId, request)
+                        if (patchResp.isSuccessful) {
+                            println("Профиль ребенка обновлен: ${patchResp.body()}")
+                            onSuccess()
+                        } else {
+                            val patchError = patchResp.errorBody()?.string()
+                            onError(
+                                parseApiError(
+                                    patchError,
+                                    "Ошибка обновления профиля ребенка: ${patchResp.code()}"
+                                )
+                            )
+                        }
+                    } else {
+                        onError(parseApiError(errorBody, "Ошибка ${response.code()}"))
+                    }
                 }
             } catch (e: Exception) {
                 onError(e.message ?: "Ошибка сети")

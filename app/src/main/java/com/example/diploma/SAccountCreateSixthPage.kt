@@ -1,4 +1,5 @@
 package com.example.diploma
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -6,8 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,42 +15,40 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.diploma.ui.auth.SpecialistViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SAccountCreateSixthPage(navController: NavController) {
-
+fun SAccountCreateSixthPage(
+    navController: NavController,
+    specialistVm: SpecialistViewModel
+) {
     val blue = Color(0xFF006FFD)
     val borderColor = Color(0xFFC5C6CC)
     val selectedBg = Color(0xFFEAF2FF)
 
-    // --- языки (multi-select)
     val languageOptions = listOf("Русский", "Казахский", "Английский")
-    var selectedLanguages by remember { mutableStateOf(setOf("Русский")) }
 
     fun toggleLang(item: String) {
-        selectedLanguages =
-            if (selectedLanguages.contains(item)) selectedLanguages - item else selectedLanguages + item
+        specialistVm.selectedLanguages =
+            if (specialistVm.selectedLanguages.contains(item))
+                specialistVm.selectedLanguages - item
+            else
+                specialistVm.selectedLanguages + item
     }
 
-    // --- timezone dropdown
     val timezones = listOf(
         "UTC/GMT +5 часов",
         "UTC/GMT +6 часов",
         "UTC/GMT +3 часов"
     )
     var tzExpanded by remember { mutableStateOf(false) }
-    var selectedTz by remember { mutableStateOf("UTC/GMT +5 часов") }
 
-    // --- city dropdown
     val cities = listOf("Алматы", "Астана", "Шымкент", "Караганда")
     var cityExpanded by remember { mutableStateOf(false) }
-    var selectedCity by remember { mutableStateOf("Алматы") }
 
     Box(
         modifier = Modifier
@@ -59,7 +56,6 @@ fun SAccountCreateSixthPage(navController: NavController) {
             .background(Color.White)
     ) {
 
-        // ================== SCROLL ==================
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -81,7 +77,6 @@ fun SAccountCreateSixthPage(navController: NavController) {
 
                 Spacer(Modifier.height(18.dp))
 
-                // ---------- Языки (мультивыбор) ----------
                 Text(
                     text = "Языки (мультивыбор)",
                     fontSize = 14.sp,
@@ -98,7 +93,7 @@ fun SAccountCreateSixthPage(navController: NavController) {
                         .padding(12.dp)
                 ) {
                     languageOptions.forEachIndexed { index, item ->
-                        val checked = selectedLanguages.contains(item)
+                        val checked = specialistVm.selectedLanguages.contains(item)
 
                         Row(
                             modifier = Modifier
@@ -134,7 +129,6 @@ fun SAccountCreateSixthPage(navController: NavController) {
 
                 Spacer(Modifier.height(16.dp))
 
-                // ---------- Часовой пояс ----------
                 Text(
                     text = "Часовой пояс",
                     fontSize = 14.sp,
@@ -150,7 +144,7 @@ fun SAccountCreateSixthPage(navController: NavController) {
                     modifier = Modifier.width(327.dp)
                 ) {
                     OutlinedTextField(
-                        value = selectedTz,
+                        value = specialistVm.timeZone,
                         onValueChange = {},
                         readOnly = true,
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = tzExpanded) },
@@ -175,7 +169,7 @@ fun SAccountCreateSixthPage(navController: NavController) {
                             DropdownMenuItem(
                                 text = { Text(tz) },
                                 onClick = {
-                                    selectedTz = tz
+                                    specialistVm.timeZone = tz
                                     tzExpanded = false
                                 }
                             )
@@ -185,7 +179,6 @@ fun SAccountCreateSixthPage(navController: NavController) {
 
                 Spacer(Modifier.height(16.dp))
 
-                // ---------- Город ----------
                 Text(
                     text = "Город",
                     fontSize = 14.sp,
@@ -201,7 +194,7 @@ fun SAccountCreateSixthPage(navController: NavController) {
                     modifier = Modifier.width(327.dp)
                 ) {
                     OutlinedTextField(
-                        value = selectedCity,
+                        value = specialistVm.city,
                         onValueChange = {},
                         readOnly = true,
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = cityExpanded) },
@@ -226,7 +219,7 @@ fun SAccountCreateSixthPage(navController: NavController) {
                             DropdownMenuItem(
                                 text = { Text(city) },
                                 onClick = {
-                                    selectedCity = city
+                                    specialistVm.city = city
                                     cityExpanded = false
                                 }
                             )
@@ -238,7 +231,6 @@ fun SAccountCreateSixthPage(navController: NavController) {
             }
         }
 
-        // ================== STICKY BUTTONS ==================
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -273,9 +265,4 @@ fun SAccountCreateSixthPage(navController: NavController) {
             }
         }
     }
-}
-@Preview(showBackground = true)
-@Composable
-fun PreviewSAccountCreateSixthPage() {
-    SAccountCreateSixthPage(navController = rememberNavController())
 }

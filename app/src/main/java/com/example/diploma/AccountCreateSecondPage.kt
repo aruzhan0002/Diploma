@@ -172,6 +172,7 @@ private fun SelectOptionCard(
 fun AccountCreateSecondPage(navController: NavController) {
     var name by remember { mutableStateOf("") }
     var isChecked by remember { mutableStateOf(false) }
+    var profileError by remember { mutableStateOf<String?>(null) }
 
     // ✅ UI-строка (чтобы подсветка работала как раньше)
     var relationshipTitle by remember { mutableStateOf("Мама") }
@@ -293,6 +294,7 @@ fun AccountCreateSecondPage(navController: NavController) {
         ) {
             Button(
                 onClick = {
+                    profileError = null
                     authVm.createProfile(
                         fullName = name,
                         relationship = selectedRelationship, // enum
@@ -301,6 +303,7 @@ fun AccountCreateSecondPage(navController: NavController) {
                             navController.navigate("AccountCreateThirdPage")
                         },
                         onError = { error ->
+                            profileError = error
                             println("PROFILE ERROR: $error")
                         }
                     )
@@ -312,6 +315,16 @@ fun AccountCreateSecondPage(navController: NavController) {
                 colors = ButtonDefaults.buttonColors(containerColor = blue)
             ) {
                 Text(text = "Далее", color = Color.White)
+            }
+
+            if (profileError != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = profileError ?: "",
+                    color = Color(0xFFD64045),
+                    style = TextStyle(fontSize = 13.sp),
+                    modifier = Modifier.width(327.dp)
+                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))

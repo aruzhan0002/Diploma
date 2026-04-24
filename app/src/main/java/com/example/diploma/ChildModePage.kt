@@ -11,6 +11,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -18,6 +23,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,10 +35,16 @@ import androidx.compose.foundation.Canvas
 
 @Composable
 fun ChildModePage(navController: NavController) {
+    val context = LocalContext.current
+    var stats by remember { mutableStateOf(GameStatsRepository.todayStats(context)) }
+
+    LaunchedEffect(Unit) {
+        stats = GameStatsRepository.todayStats(context)
+    }
 
     Scaffold(
         bottomBar = {
-            BottomBar(navController, selectedIndex = 0)
+            BottomBar(navController, selectedIndex = 2)
         }
     ) { innerPadding ->
 
@@ -41,30 +53,20 @@ fun ChildModePage(navController: NavController) {
                 .fillMaxSize()
                 .background(Color.White)
                 .padding(innerPadding)
-                .padding(horizontal = 20.dp, vertical = 24.dp),
+                .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
 
             // Верхняя панель — заголовок и иконка настроек
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = "Детский режим",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
-                )
-
-                Image(
-                    painter = painterResource(id = R.drawable.icon5),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(22.dp)
-                        .clickable {
-                            navController.navigate("ChildModeSettingsPage")
-                        }
                 )
             }
 
@@ -77,13 +79,13 @@ fun ChildModePage(navController: NavController) {
             Card(
                 shape = RoundedCornerShape(18.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFF4F6FA)
+                    containerColor = Color(0xFF2F6FED)
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp)
+                    .height(95.dp)
                     .clickable {
-                        // TODO: переход прямо в детский режим, когда будет готов экран
+                        navController.navigate("ChildGamesPage")
                     }
             ) {
                 Column(
@@ -94,15 +96,11 @@ fun ChildModePage(navController: NavController) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Перейти в детский режим",
-                        fontSize = 16.sp,
+                        text = "▶ Начать игру",
+                        fontSize = 28.sp / 2,
                         fontWeight = FontWeight.SemiBold
-                    )
-
-                    Text(
-                        text = "Нажмите чтобы перейти в детский режим",
-                        fontSize = 13.sp,
-                        color = Color.Gray
+                        ,
+                        color = Color.White
                     )
                 }
             }
@@ -118,6 +116,8 @@ fun ChildModePage(navController: NavController) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 TodayActivityCard(
+                    playedCount = stats.playedCount,
+                    wonCount = stats.wonCount,
                     modifier = Modifier
                         .width(169.dp)
                         .height(200.dp)
@@ -129,12 +129,12 @@ fun ChildModePage(navController: NavController) {
                 ) {
                     SmallActivityCard(
                         title = "Время",
-                        value = "12 мин",
+                        value = "${stats.totalMinutes} мин",
                         modifier = Modifier.height(97.75.dp)
                     )
                     SmallActivityCard(
-                        title = "Текущий модуль",
-                        value = "Моторика",
+                        title = "Последняя игра",
+                        value = stats.lastGameTitle,
                         modifier = Modifier.height(97.75.dp)
                     )
                 }
@@ -145,6 +145,8 @@ fun ChildModePage(navController: NavController) {
 
 @Composable
 private fun TodayActivityCard(
+    playedCount: Int,
+    wonCount: Int,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -169,25 +171,28 @@ private fun TodayActivityCard(
                 )
                 Spacer(modifier = Modifier.height(15.dp))
                 Text(
-                    text = "3 задачи",
+                    text = "$playedCount игр",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "Побед: $wonCount",
+                    fontSize = 12.sp,
+                    color = Color(0xFF5A6475)
                 )
             }
 
             Spacer(modifier = Modifier.padding(15.dp))
 
             // Круговой индикатор как в дизайне: 55×55, толщина 7dp, снизу карточки
-            Canvas(
-                modifier = Modifier.size(55.dp)
-            ) {
+            Canvas(modifier = Modifier.size(56.dp)) {
                 val strokeWidth = 7.dp.toPx()
-                val inset = strokeWidth / 2f
-                val arcSize = Size(
-                    width = size.width - inset * 2,
-                    height = size.height - inset * 2
-                )
-                val topLeft = Offset(inset, inset)
+                val side = size.minDimension - strokeWidth
+                val insetX = (size.width - side) / 2f
+                val insetY = (size.height - side) / 2f
+                val arcSize = Size(side, side)
+                val topLeftSquare = Offset(insetX + strokeWidth / 2f, insetY + strokeWidth / 2f)
 
                 // Серое кольцо
                 drawArc(
@@ -195,18 +200,19 @@ private fun TodayActivityCard(
                     startAngle = 0f,
                     sweepAngle = 360f,
                     useCenter = false,
-                    topLeft = topLeft,
+                    topLeft = topLeftSquare,
                     size = arcSize,
                     style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                 )
 
-                // Синяя дуга прогресса
+                val progressSweep = if (playedCount <= 0) 0f else (360f * wonCount.toFloat() / playedCount.toFloat())
+                // Синяя дуга прогресса побед
                 drawArc(
                     color = Color(0xFF006FFD),
                     startAngle = -90f,
-                    sweepAngle = 250f,
+                    sweepAngle = progressSweep,
                     useCenter = false,
-                    topLeft = topLeft,
+                    topLeft = topLeftSquare,
                     size = arcSize,
                     style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                 )

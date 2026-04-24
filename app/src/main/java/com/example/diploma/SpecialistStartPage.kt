@@ -98,7 +98,22 @@ fun SpecialistStartPage(navController: NavController) {
             Text("Далее", color = Color.White)
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(12.dp))
+
+        androidx.compose.material3.TextButton(
+            onClick = { navController.navigate("LoginScreen/specialist") }
+        ) {
+            Text(
+                text = "Уже есть аккаунт? Войти",
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    color = Color(0xFF006FFD),
+                    fontWeight = FontWeight.Medium
+                )
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
     }
 }
 

@@ -1,7 +1,6 @@
 package com.example.diploma
 
 import android.app.Application
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -26,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.diploma.R
 import com.example.diploma.ui.auth.AuthViewModel
 import com.example.diploma.ui.auth.AuthViewModelFactory
 
@@ -56,7 +56,8 @@ fun CreateAccountFirstPage(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var isPasswordVisible by remember { mutableStateOf(false) }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
     var isChecked by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -124,7 +125,7 @@ fun CreateAccountFirstPage(navController: NavController) {
                     placeholder = { Text("name@email.com") },
                     modifier = Modifier
                         .width(327.dp)
-                        .height(50.dp)
+                        .defaultMinSize(minHeight = 56.dp)
                         .border(1.dp, Color(0xFFC5C6CC), RoundedCornerShape(12.dp)),
                     textStyle = TextStyle(fontSize = 14.sp),
                     singleLine = true,
@@ -158,22 +159,25 @@ fun CreateAccountFirstPage(navController: NavController) {
                         errorMessage = null
                     },
                     placeholder = { Text("Пароль") },
-                    visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(
-                            onClick = { isPasswordVisible = !isPasswordVisible },
+                            onClick = { passwordVisible = !passwordVisible },
                             enabled = !isLoading
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.img3),
-                                contentDescription = "Toggle password visibility",
-                                modifier = Modifier.size(16.dp)
+                                painter = painterResource(
+                                    id = if (passwordVisible) R.drawable.ic_password_show else R.drawable.ic_password_hide
+                                ),
+                                contentDescription = if (passwordVisible) "Скрыть пароль" else "Показать пароль",
+                                modifier = Modifier.size(20.dp),
+                                tint = Color.Unspecified
                             )
                         }
                     },
                     modifier = Modifier
                         .width(327.dp)
-                        .height(48.dp)
+                        .defaultMinSize(minHeight = 56.dp)
                         .border(1.dp, Color(0xFFC5C6CC), RoundedCornerShape(12.dp)),
                     textStyle = TextStyle(fontSize = 14.sp),
                     singleLine = true,
@@ -207,22 +211,25 @@ fun CreateAccountFirstPage(navController: NavController) {
                         errorMessage = null
                     },
                     placeholder = { Text("Подтвердите пароль") },
-                    visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(
-                            onClick = { isPasswordVisible = !isPasswordVisible },
+                            onClick = { confirmPasswordVisible = !confirmPasswordVisible },
                             enabled = !isLoading
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.img3),
-                                contentDescription = "Toggle password visibility",
-                                modifier = Modifier.size(16.dp)
+                                painter = painterResource(
+                                    id = if (confirmPasswordVisible) R.drawable.ic_password_show else R.drawable.ic_password_hide
+                                ),
+                                contentDescription = if (confirmPasswordVisible) "Скрыть пароль" else "Показать пароль",
+                                modifier = Modifier.size(20.dp),
+                                tint = Color.Unspecified
                             )
                         }
                     },
                     modifier = Modifier
                         .width(327.dp)
-                        .height(48.dp)
+                        .defaultMinSize(minHeight = 56.dp)
                         .border(1.dp, Color(0xFFC5C6CC), RoundedCornerShape(12.dp)),
                     textStyle = TextStyle(fontSize = 14.sp),
                     singleLine = true,

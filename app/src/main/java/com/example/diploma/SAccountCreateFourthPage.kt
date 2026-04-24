@@ -16,35 +16,31 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.diploma.ui.auth.SpecialistViewModel
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SAccountCreateFourthPage(navController: NavController) {
-
+fun SAccountCreateFourthPage(
+    navController: NavController,
+    specialistVm: SpecialistViewModel
+) {
     val blue = Color(0xFF006FFD)
     val borderColor = Color(0xFFC5C6CC)
     val selectedBg = Color(0xFFEAF2FF)
     val radius = RoundedCornerShape(16.dp)
 
-    // Стаж
-    var expYears by remember { mutableFloatStateOf(5f) } // по макету 5
-    val expInt = expYears.roundToInt()
+    val expInt = specialistVm.yearsExperience.roundToInt()
 
-    // Методики (один выбор)
     val options = listOf(
         "ABA",
         "PECS",
         "DIR / Floortime",
         "Сенсорная интеграция"
     )
-    var selectedMethod by remember { mutableStateOf("ABA") }
-    var otherText by remember { mutableStateOf("") }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -76,7 +72,6 @@ fun SAccountCreateFourthPage(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(18.dp))
 
-                // Стаж работы + число рядом
                 Row(
                     modifier = Modifier.width(327.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -94,10 +89,9 @@ fun SAccountCreateFourthPage(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-
                 Slider(
-                    value = expYears,
-                    onValueChange = { expYears = it },
+                    value = specialistVm.yearsExperience,
+                    onValueChange = { specialistVm.yearsExperience = it },
                     valueRange = 0f..25f,
                     modifier = Modifier.width(327.dp),
                     colors = SliderDefaults.colors(
@@ -109,7 +103,6 @@ fun SAccountCreateFourthPage(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Методики
                 Text(
                     text = "Методики",
                     style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold),
@@ -118,7 +111,6 @@ fun SAccountCreateFourthPage(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Карточка с вариантами + "Другое"
                 Column(
                     modifier = Modifier
                         .width(327.dp)
@@ -129,7 +121,7 @@ fun SAccountCreateFourthPage(navController: NavController) {
                 ) {
 
                     options.forEachIndexed { index, item ->
-                        val isSelected = (item == selectedMethod)
+                        val isSelected = (item == specialistVm.method)
 
                         Row(
                             modifier = Modifier
@@ -137,10 +129,7 @@ fun SAccountCreateFourthPage(navController: NavController) {
                                 .height(52.dp)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(if (isSelected) selectedBg else Color.White)
-                                .clickable {
-                                    selectedMethod = item
-                                    // если выбрали не "Другое" — можно оставить otherText как есть
-                                }
+                                .clickable { specialistVm.method = item }
                                 .padding(horizontal = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -168,7 +157,6 @@ fun SAccountCreateFourthPage(navController: NavController) {
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Другое — большое поле
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -180,10 +168,10 @@ fun SAccountCreateFourthPage(navController: NavController) {
                         Box(Modifier.fillMaxSize()) {
 
                             OutlinedTextField(
-                                value = otherText,
+                                value = specialistVm.methodOther,
                                 onValueChange = {
-                                    otherText = it
-                                    selectedMethod = "Другое"
+                                    specialistVm.methodOther = it
+                                    specialistVm.method = "Другое"
                                 },
                                 placeholder = { Text("Другое", color = Color(0xFF9AA0A6)) },
                                 modifier = Modifier.fillMaxSize(),
@@ -197,7 +185,7 @@ fun SAccountCreateFourthPage(navController: NavController) {
                                 )
                             )
 
-                            if (selectedMethod == "Другое") {
+                            if (specialistVm.method == "Другое") {
                                 Icon(
                                     imageVector = Icons.Filled.Check,
                                     contentDescription = null,
@@ -220,7 +208,6 @@ fun SAccountCreateFourthPage(navController: NavController) {
                 )
             }
 
-            // КНОПКИ фикс снизу
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -230,7 +217,7 @@ fun SAccountCreateFourthPage(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(
-                    onClick = { navController.navigate("SAccountCreateFifthPage") }, // поменяй маршрут если у тебя другой
+                    onClick = { navController.navigate("SAccountCreateFifthPage") },
                     modifier = Modifier
                         .width(327.dp)
                         .height(45.dp),
@@ -256,10 +243,4 @@ fun SAccountCreateFourthPage(navController: NavController) {
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSAccountCreateFourthPage() {
-    SAccountCreateFourthPage(navController = rememberNavController())
 }

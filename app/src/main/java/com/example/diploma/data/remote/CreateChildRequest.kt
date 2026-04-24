@@ -4,6 +4,7 @@ data class ChildProfileResponse(
     val id: Int,
     val name: String,
     val age: Int,
+    val avatar: String? = null,
     val development_type: String,
     val communication_style: String,
     val understands_instructions: String,
@@ -26,6 +27,6 @@ data class CreateChildRequest(
     val motor_difficulties: String,
     val behavior_notices: String,
     val motivators: String,
-    val interests: String,               // "cars,food,space,letters,numbers,animals,music,drawing,puzzles,sport,books,games,logic,colors,dinosaurs,experiments"
+    val interests: String,
     val comfortable_duration: String
 )

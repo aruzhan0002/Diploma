@@ -34,7 +34,7 @@ fun ParentHomePage(navController: NavController) {
 
     Scaffold(
         bottomBar = {
-            BottomBar(navController, selectedIndex = 2)
+            BottomBar(navController, selectedIndex = 3)
         }
     ) { innerPadding ->
 

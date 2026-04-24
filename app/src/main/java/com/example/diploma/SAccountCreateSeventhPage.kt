@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -20,87 +21,176 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.diploma.ui.auth.SpecialistViewModel
 
 @Composable
-fun SAccountCreateSeventhPage(navController: NavController) {
+fun SAccountCreateSeventhPage(
+    navController: NavController,
+    specialistVm: SpecialistViewModel
+) {
     val blue = Color(0xFF006FFD)
     val border = Color(0xFFC5C6CC)
 
-    var consult by remember { mutableStateOf(true) }
-    var viaParent by remember { mutableStateOf(false) }
-    var plans by remember { mutableStateOf(true) }
-    var analytics by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    ScreenWithStickyButtons(
-        navController = navController,
-        currentStep = 7, // если у специалиста это последний шаг — ставь нужный
-        title = "Как вы хотите работать\nв приложении?",
-        nextText = "Перейти в приложение",
-        onNext = {
-            // сюда поставь переход в SettingsPage (или главный экран специалиста)
-            navController.navigate("SettingsPageSpecialist")
-        }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
     ) {
-        item {
-            Spacer(modifier = Modifier.height(10.dp))
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 140.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item {
+                StepProgressBar1(currentStep = 7)
 
-            Text(
-                text = "Переключатели",
-                style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold),
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = "Как вы хотите работать\nв приложении?",
+                    style = TextStyle(fontSize = 26.sp, fontWeight = FontWeight.Bold),
+                    modifier = Modifier.width(327.dp)
+                )
+
+                Spacer(modifier = Modifier.height(18.dp))
+            }
+
+            item {
+                if (errorMessage != null) {
+                    Text(
+                        text = errorMessage!!,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .width(327.dp)
+                            .padding(vertical = 8.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = "Переключатели",
+                    style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold),
+                    modifier = Modifier.width(327.dp)
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                SwitchCard(
+                    text = "Оказывать индивидуальные\nконсультации",
+                    checked = specialistVm.provideConsultations,
+                    onCheckedChange = { specialistVm.provideConsultations = it },
+                    width = 327.dp,
+                    borderColor = border,
+                    blue = blue
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                SwitchCard(
+                    text = "Работать с ребёнком через\nродителя",
+                    checked = specialistVm.workViaParent,
+                    onCheckedChange = { specialistVm.workViaParent = it },
+                    width = 327.dp,
+                    borderColor = border,
+                    blue = blue
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                SwitchCard(
+                    text = "Давать рекомендации и планы\nзанятий",
+                    checked = specialistVm.provideRecommendations,
+                    onCheckedChange = { specialistVm.provideRecommendations = it },
+                    width = 327.dp,
+                    borderColor = border,
+                    blue = blue
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                SwitchCard(
+                    text = "Вести прогресс и аналитику",
+                    checked = specialistVm.trackAnalytics,
+                    onCheckedChange = { specialistVm.trackAnalytics = it },
+                    width = 327.dp,
+                    borderColor = border,
+                    blue = blue
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(horizontal = 16.dp, vertical = 16.dp)
+        ) {
+            Button(
+                onClick = {
+                    isLoading = true
+                    errorMessage = null
+                    specialistVm.submitSpecialistDescription(
+                        onSuccess = {
+                            isLoading = false
+                            navController.navigate("SettingsPageSpecialist") {
+                                popUpTo("startScreen") { inclusive = false }
+                            }
+                        },
+                        onError = { error ->
+                            isLoading = false
+                            errorMessage = error
+                        }
+                    )
+                },
                 modifier = Modifier
                     .width(327.dp)
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            SwitchCard(
-                text = "Оказывать индивидуальные\nконсультации",
-                checked = consult,
-                onCheckedChange = { consult = it },
-                width = 327.dp,
-                borderColor = border,
-                blue = blue
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            SwitchCard(
-                text = "Работать с ребёнком через\nродителя",
-                checked = viaParent,
-                onCheckedChange = { viaParent = it },
-                width = 327.dp,
-                borderColor = border,
-                blue = blue
-            )
+                    .height(45.dp)
+                    .align(Alignment.CenterHorizontally),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = blue,
+                    disabledContainerColor = blue.copy(alpha = 0.5f)
+                ),
+                enabled = !isLoading
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                } else {
+                    Text("Перейти в приложение", color = Color.White)
+                }
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            SwitchCard(
-                text = "Давать рекомендации и планы\nзанятий",
-                checked = plans,
-                onCheckedChange = { plans = it },
-                width = 327.dp,
-                borderColor = border,
-                blue = blue
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            SwitchCard(
-                text = "Вести прогресс и аналитику",
-                checked = analytics,
-                onCheckedChange = { analytics = it },
-                width = 327.dp,
-                borderColor = border,
-                blue = blue
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
+            OutlinedButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier
+                    .width(327.dp)
+                    .height(45.dp)
+                    .align(Alignment.CenterHorizontally),
+                shape = RoundedCornerShape(12.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, blue),
+                colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White),
+                enabled = !isLoading
+            ) {
+                Text("Назад", color = blue)
+            }
         }
     }
 }
@@ -140,16 +230,9 @@ private fun SwitchCard(
                 uncheckedTrackColor = Color(0xFFD8D8D8)
             )
         )
-
     }
 }
 
-/**
- * Универсальный шаблон как у 6/7/8:
- * - StepProgressBar + Title сверху
- * - контент скроллится
- * - кнопки всегда фиксированы внизу
- */
 @Composable
 fun ScreenWithStickyButtons(
     navController: NavController,
@@ -226,10 +309,4 @@ fun ScreenWithStickyButtons(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSAccountCreateSeventhPage() {
-    SAccountCreateSeventhPage(navController = rememberNavController())
 }

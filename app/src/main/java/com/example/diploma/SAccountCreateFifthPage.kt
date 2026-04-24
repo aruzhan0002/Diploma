@@ -17,21 +17,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.diploma.ui.auth.SpecialistViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SAccountCreateFifthPage(navController: NavController) {
-
+fun SAccountCreateFifthPage(
+    navController: NavController,
+    specialistVm: SpecialistViewModel
+) {
     val blue = Color(0xFF006FFD)
     val borderColor = Color(0xFFC5C6CC)
     val selectedBg = Color(0xFFEAF2FF)
-
-    var ageText by remember { mutableStateOf("2-4, Подростки") }
 
     val devOptions = listOf(
         "Аутизм (РАС)",
@@ -39,10 +38,6 @@ fun SAccountCreateFifthPage(navController: NavController) {
         "ЗПР",
         "Смешанные случаи"
     )
-    var selectedDev by remember { mutableStateOf("Аутизм (РАС)") }
-    var otherDev by remember { mutableStateOf("") }
-
-    var workFormat by remember { mutableStateOf("Онлайн") }
 
     Box(
         modifier = Modifier
@@ -50,12 +45,11 @@ fun SAccountCreateFifthPage(navController: NavController) {
             .background(Color.White)
     ) {
 
-        // ================= SCROLL =================
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
-                .padding(bottom = 140.dp), // 🔴 важно
+                .padding(bottom = 140.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -72,7 +66,6 @@ fun SAccountCreateFifthPage(navController: NavController) {
 
                 Spacer(Modifier.height(20.dp))
 
-                // ---------- Возраст ----------
                 Text(
                     text = "Возраст",
                     fontSize = 14.sp,
@@ -83,8 +76,8 @@ fun SAccountCreateFifthPage(navController: NavController) {
                 Spacer(Modifier.height(8.dp))
 
                 OutlinedTextField(
-                    value = ageText,
-                    onValueChange = { ageText = it },
+                    value = specialistVm.ageRange,
+                    onValueChange = { specialistVm.ageRange = it },
                     modifier = Modifier
                         .width(327.dp)
                         .height(52.dp),
@@ -100,7 +93,6 @@ fun SAccountCreateFifthPage(navController: NavController) {
 
                 Spacer(Modifier.height(16.dp))
 
-                // ---------- Тип развития ----------
                 Text(
                     text = "Тип развития",
                     fontSize = 14.sp,
@@ -118,7 +110,7 @@ fun SAccountCreateFifthPage(navController: NavController) {
                 ) {
 
                     devOptions.forEach { item ->
-                        val selected = selectedDev == item
+                        val selected = specialistVm.developmentType == item
 
                         Row(
                             modifier = Modifier
@@ -126,7 +118,7 @@ fun SAccountCreateFifthPage(navController: NavController) {
                                 .height(52.dp)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(if (selected) selectedBg else Color.White)
-                                .clickable { selectedDev = item }
+                                .clickable { specialistVm.developmentType = item }
                                 .padding(horizontal = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -149,10 +141,10 @@ fun SAccountCreateFifthPage(navController: NavController) {
                     }
 
                     OutlinedTextField(
-                        value = otherDev,
+                        value = specialistVm.developmentTypeOther,
                         onValueChange = {
-                            otherDev = it
-                            selectedDev = "Другое"
+                            specialistVm.developmentTypeOther = it
+                            specialistVm.developmentType = "Другое"
                         },
                         placeholder = { Text("Другое") },
                         modifier = Modifier
@@ -170,7 +162,6 @@ fun SAccountCreateFifthPage(navController: NavController) {
 
                 Spacer(Modifier.height(16.dp))
 
-                // ---------- Формат работы ----------
                 Text(
                     text = "Формат работы",
                     fontSize = 14.sp,
@@ -188,11 +179,11 @@ fun SAccountCreateFifthPage(navController: NavController) {
                         .padding(6.dp),
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    SegButton("Офлайн", workFormat == "Офлайн") {
-                        workFormat = "Офлайн"
+                    SegButton("Офлайн", specialistVm.workFormat == "Офлайн") {
+                        specialistVm.workFormat = "Офлайн"
                     }
-                    SegButton("Онлайн", workFormat == "Онлайн") {
-                        workFormat = "Онлайн"
+                    SegButton("Онлайн", specialistVm.workFormat == "Онлайн") {
+                        specialistVm.workFormat = "Онлайн"
                     }
                 }
 
@@ -200,7 +191,6 @@ fun SAccountCreateFifthPage(navController: NavController) {
             }
         }
 
-        // ================= BUTTONS =================
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -236,14 +226,12 @@ fun SAccountCreateFifthPage(navController: NavController) {
     }
 }
 
-
 @Composable
 private fun SegButton(
     text: String,
     selected: Boolean,
     onClick: () -> Unit
 ) {
-    val blue = Color(0xFF006FFD)
     val bg = if (selected) Color(0xFFF6F8FF) else Color.White
     val fg = if (selected) Color.Black else Color(0xFF8D8D8D)
 
@@ -262,10 +250,4 @@ private fun SegButton(
             color = fg
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSAccountCreateFifthPage() {
-    SAccountCreateFifthPage(navController = rememberNavController())
 }

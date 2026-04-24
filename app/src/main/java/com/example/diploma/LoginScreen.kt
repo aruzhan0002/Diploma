@@ -1,9 +1,8 @@
+import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,36 +14,55 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.diploma.R
+import com.example.diploma.ui.auth.AuthViewModel
+import com.example.diploma.ui.auth.AuthViewModelFactory
 
 @Composable
-fun LoginScreen(navController: NavController) {
-    var passwordVisible by remember { mutableStateOf(false) } // Состояние видимости пароля
+fun LoginScreen(navController: NavController, role: String = "specialist") {
+    var passwordVisible by remember { mutableStateOf(false) }
     var passwordText by remember { mutableStateOf("") }
-    var emailText by remember { mutableStateOf("") }// Текст пароля
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Заголовок экрана
+    var emailText by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
-        // Изображение в верхней части экрана
+    val context = LocalContext.current
+    val authVm: AuthViewModel = viewModel(
+        factory = AuthViewModelFactory(context.applicationContext as Application)
+    )
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (role == "specialist") {
+            TextButton(
+                onClick = { navController.navigate("SettingsPageSpecialist") },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .statusBarsPadding()
+                    .padding(top = 4.dp, end = 8.dp)
+            ) {
+                Text("Настройки", style = TextStyle(fontSize = 16.sp, color = Color(0xFF006FFD)))
+            }
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
         Image(
-            painter = painterResource(id = R.drawable.img2), // Замените на свой ресурс
+            painter = painterResource(id = R.drawable.img2),
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(315.dp), // Регулируйте высоту по необходимости
+                .height(315.dp),
             contentScale = ContentScale.Crop
         )
         Spacer(
@@ -60,18 +78,26 @@ fun LoginScreen(navController: NavController) {
             modifier = Modifier.padding(top = 20.dp, bottom = 20.dp)
         )
 
-        // Поля ввода
         Column(
-
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp),
-
         ) {
-            // Поле для ввода почты
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage!!,
+                    color = Color.Red,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
+
             TextField(
                 value = emailText,
-                onValueChange = { emailText = it },
+                onValueChange = {
+                    emailText = it
+                    errorMessage = null
+                },
                 label = { Text("Почта") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -80,97 +106,132 @@ fun LoginScreen(navController: NavController) {
                     .border(1.dp, Color(0xC5C6CC), shape = RoundedCornerShape(12.dp))
                     .clip(RoundedCornerShape(12.dp)),
                 textStyle = TextStyle(fontSize = 16.sp),
-                singleLine = true // Оставляем поле для ввода одной строки
+                singleLine = true,
+                enabled = !isLoading
             )
 
-            // Поле для ввода пароля
             TextField(
                 value = passwordText,
-                onValueChange = { passwordText = it },
+                onValueChange = {
+                    passwordText = it
+                    errorMessage = null
+                },
                 label = { Text("Пароль") },
                 modifier = Modifier
-                    .width(327.dp)
+                    .fillMaxWidth()
                     .padding(vertical = 8.dp)
-                    .height(50.dp)
-                    .border(1.dp, Color(0xC5C6CC), shape = RoundedCornerShape(12.dp)) // Рамка для поля
+                    .border(1.dp, Color(0xC5C6CC), shape = RoundedCornerShape(12.dp))
                     .clip(RoundedCornerShape(12.dp)),
+                textStyle = TextStyle(fontSize = 16.sp),
+                singleLine = true,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(painter = painterResource(id = R.drawable.img3), contentDescription = "Toggle password visibility",
-                            modifier = Modifier.size(16.dp))
+                        Icon(
+                            painter = painterResource(
+                                id = if (passwordVisible) R.drawable.ic_password_show else R.drawable.ic_password_hide
+                            ),
+                            contentDescription = if (passwordVisible) "Скрыть пароль" else "Показать пароль",
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.Unspecified
+                        )
                     }
-                }
+                },
+                enabled = !isLoading
             )
 
-            // Ссылка для забытого пароля
             TextButton(
-                onClick = { /* Handle forgot password action */ },
-
+                onClick = { navController.navigate("ForgotPasswordEmailPage/$role") },
             ) {
                 Text(
                     text = "Забыли пароль?",
                     style = TextStyle(fontSize = 16.sp, color = Color(0xFF006FFD)),
                     modifier = Modifier.padding(vertical = 8.dp)
-
                 )
             }
-        }
+        } 
 
-        // Кнопки
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp) // Отступы между кнопками
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Кнопка входа
             Button(
                 onClick = {
-                    navController.navigate("SettingsPage")
+                    if (emailText.isBlank() || passwordText.isBlank()) {
+                        errorMessage = "Введите логин и пароль"
+                        return@Button
+                    }
+                    isLoading = true
+                    errorMessage = null
+                    authVm.login(
+                        email = emailText.trim(),
+                        password = passwordText,
+                        onSuccess = { userType ->
+                            isLoading = false
+                            val destination = when (userType?.lowercase()) {
+                                "specialist" -> "SettingsPageSpecialist"
+                                "parent" -> "SettingsPage"
+                                "both" -> if (role == "specialist") "SettingsPageSpecialist" else "SettingsPage"
+                                "none" -> if (role == "specialist") "SettingsPageSpecialist" else "SettingsPage"
+                                else -> if (role == "specialist") "SettingsPageSpecialist" else "SettingsPage"
+                            }
+                            navController.navigate(destination) {
+                                popUpTo("startScreen") { inclusive = false }
+                                launchSingleTop = true
+                            }
+                        },
+                        onError = { error ->
+                            isLoading = false
+                            errorMessage = error
+                        }
+                    )
                 },
                 modifier = Modifier
-                    .width(327.dp) // Ширина кнопки
-                    .height(45.dp) // Высота кнопки
+                    .width(327.dp)
+                    .height(45.dp)
                     .border(5.dp, Color(0xFF006FFD), shape = RoundedCornerShape(12.dp))
-                    .clip(RoundedCornerShape(12.dp)), // Скругленные углы
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006FFD)) // Синий фон
+                    .clip(RoundedCornerShape(12.dp)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF006FFD),
+                    disabledContainerColor = Color(0xFF006FFD)
+                ),
+                enabled = true
             ) {
-                Text(text = "Войти", color = Color.White) // Белый текст
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                } else {
+                    Text(text = "Войти", color = Color.White)
+                }
             }
             Divider(
-                color = Color.Gray.copy(alpha = 0.4f), // 40% непрозрачности (60% прозрачности)
+                color = Color.Gray.copy(alpha = 0.4f),
                 thickness = 1.dp,
-                modifier = Modifier.padding(vertical = 8.dp) // Отступ сверху и снизу
+                modifier = Modifier.padding(vertical = 8.dp)
             )
 
-            // Текст "или" — вставляем сюда между кнопками
             Text(
                 text = "или",
                 style = TextStyle(fontSize = 16.sp, color = Color.Gray),
-                modifier = Modifier.padding(vertical = 5.dp).align(Alignment.CenterHorizontally) // Центрируем текст
+                modifier = Modifier.padding(vertical = 5.dp).align(Alignment.CenterHorizontally)
             )
 
-            // Кнопка регистрации
             Button(
                 onClick = { navController.popBackStack()},
                 modifier = Modifier
-                    .width(327.dp) // Ширина кнопки
+                    .width(327.dp)
                     .height(45.dp)
-                    .border(1.dp, Color(0xFF006FFD), shape = RoundedCornerShape(12.dp)), // Синяя рамка с закруглениями
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White) // Белый фон
+                    .border(1.dp, Color(0xFF006FFD), shape = RoundedCornerShape(12.dp)),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                enabled = !isLoading
             ) {
-                Text(text = "Зарегистрироваться", color = Color(0xFF006FFD)) // Синий текст
+                Text(text = "Зарегистрироваться", color = Color(0xFF006FFD))
             }
+        }
         }
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun DefaultPreview() {
-//    val navController = rememberNavController()  // Создаем NavController
-//    MaterialTheme {
-//        LoginScreen(navController = navController) // Передаем его в LoginScreen
-//    }
-//}

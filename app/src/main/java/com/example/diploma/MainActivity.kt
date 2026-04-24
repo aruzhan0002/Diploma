@@ -1,6 +1,9 @@
 package com.example.diploma
 
 import LoginScreen
+import ForgotPasswordCodePage
+import ForgotPasswordEmailPage
+import ForgotPasswordNewPasswordPage
 import StartScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,13 +13,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.diploma.data.remote.TokenStorage
+import com.example.diploma.ui.auth.SpecialistViewModel
 import com.example.diploma.ui.child.ChildViewModel
 
 
@@ -24,25 +31,100 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         TokenStorage.loadTokens(this)
+        CartRepository.init(this)
+        FavoritesRepository.init(this)
+        PurchaseAnalyticsRepository.init(this)
         setContent {
             MaterialTheme {
-                // Используем NavController для навигации
+                // РСЃРїРѕР»СЊР·СѓРµРј NavController РґР»СЏ РЅР°РІРёРіР°С†РёРё
                 val navController = rememberNavController()
                 val childVm: ChildViewModel = viewModel()
+                val specialistVm: SpecialistViewModel = viewModel()
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // Навигация
+                    val courseFilters = remember { CourseFilters() }
                     NavHost(navController = navController, startDestination = "startScreen") {
                         composable("startScreen") {
                             StartScreen(navController = navController)
                         }
                         composable("parentScreen") {
-                            ParentScreen(navController = navController) // Передаем navController
+                            ParentScreen(navController = navController) // РџРµСЂРµРґР°РµРј navController
                         }
-                        composable("LoginScreen") {
-                            LoginScreen(navController = navController)
+                        composable(
+                            "LoginScreen/{role}",
+                            arguments = listOf(navArgument("role") {
+                                type = NavType.StringType
+                                defaultValue = "specialist"
+                            })
+                        ) { backStackEntry ->
+                            val role = backStackEntry.arguments?.getString("role") ?: "specialist"
+                            LoginScreen(navController = navController, role = role)
+                        }
+                        composable(
+                            "ForgotPasswordEmailPage/{role}",
+                            arguments = listOf(navArgument("role") {
+                                type = NavType.StringType
+                                defaultValue = "specialist"
+                            })
+                        ) { backStackEntry ->
+                            val role = backStackEntry.arguments?.getString("role") ?: "specialist"
+                            ForgotPasswordEmailPage(navController = navController, role = role)
+                        }
+                        composable(
+                            "ForgotPasswordCodePage/{role}?email={email}&retryAfter={retryAfter}",
+                            arguments = listOf(
+                                navArgument("role") {
+                                    type = NavType.StringType
+                                    defaultValue = "specialist"
+                                },
+                                navArgument("email") {
+                                    type = NavType.StringType
+                                    defaultValue = ""
+                                },
+                                navArgument("retryAfter") {
+                                    type = NavType.IntType
+                                    defaultValue = 14
+                                }
+                            )
+                        ) { backStackEntry ->
+                            val role = backStackEntry.arguments?.getString("role") ?: "specialist"
+                            val email = backStackEntry.arguments?.getString("email") ?: ""
+                            val retryAfter = backStackEntry.arguments?.getInt("retryAfter") ?: 14
+                            ForgotPasswordCodePage(
+                                navController = navController,
+                                role = role,
+                                email = email,
+                                initialRetryAfter = retryAfter
+                            )
+                        }
+                        composable(
+                            "ForgotPasswordNewPasswordPage/{role}?email={email}&resetToken={resetToken}",
+                            arguments = listOf(
+                                navArgument("role") {
+                                    type = NavType.StringType
+                                    defaultValue = "specialist"
+                                },
+                                navArgument("email") {
+                                    type = NavType.StringType
+                                    defaultValue = ""
+                                },
+                                navArgument("resetToken") {
+                                    type = NavType.StringType
+                                    defaultValue = ""
+                                }
+                            )
+                        ) { backStackEntry ->
+                            val role = backStackEntry.arguments?.getString("role") ?: "specialist"
+                            val email = backStackEntry.arguments?.getString("email") ?: ""
+                            val resetToken = backStackEntry.arguments?.getString("resetToken") ?: ""
+                            ForgotPasswordNewPasswordPage(
+                                navController = navController,
+                                role = role,
+                                email = email,
+                                resetToken = resetToken
+                            )
                         }
                         composable("CreateAccountFirstPage") {
                             CreateAccountFirstPage(navController = navController)
@@ -101,35 +183,44 @@ class MainActivity : ComponentActivity() {
                         composable("SettingsPage") {
                             SettingsPage(navController)
                         }
+                        composable("ParentProfileEditPage") {
+                            ParentProfileEditPage(navController)
+                        }
+                        composable("ParentChildEditPage") {
+                            ParentChildEditPage(navController)
+                        }
                         composable("SpecialistStartPage") {
                             SpecialistStartPage(navController)
                         }
                         composable("SAccountCreateFirstPage") {
-                            SAccountCreateFirstPage(navController)
+                            SAccountCreateFirstPage(navController, specialistVm)
                         }
                         composable("SAccountCreateSecondPage") {
-                            SAccountCreateSecondPage(navController)
+                            SAccountCreateSecondPage(navController, specialistVm)
                         }
                         composable("SAccountCreateThirdPage") {
-                            SAccountCreateThirdPage(navController)
+                            SAccountCreateThirdPage(navController, specialistVm)
                         }
                         composable("SAccountCreateFourthPage") {
-                            SAccountCreateFourthPage(navController)
+                            SAccountCreateFourthPage(navController, specialistVm)
                         }
                         composable("SAccountCreateFifthPage") {
-                            SAccountCreateFifthPage(navController)
+                            SAccountCreateFifthPage(navController, specialistVm)
                         }
                         composable("SAccountCreateSixthPage") {
-                            SAccountCreateSixthPage(navController)
+                            SAccountCreateSixthPage(navController, specialistVm)
                         }
                         composable("SAccountCreateSeventhPage") {
-                            SAccountCreateSeventhPage(navController)
+                            SAccountCreateSeventhPage(navController, specialistVm)
                         }
                         composable("SettingsPageSpecialist") {
                             SettingsPageSpecialist(navController)
                         }
-                        composable("ChildPage") {
-                            ChildPage(navController)
+                        composable("SpecialistProfileSettingsPage") {
+                            SpecialistProfileSettingsPage(navController)
+                        }
+                        composable("SpecialistDashboardPage") {
+                            SpecialistDashboardPage(navController)
                         }
                         composable("ChildModePage") {
                             ChildModePage(navController)
@@ -137,35 +228,101 @@ class MainActivity : ComponentActivity() {
                         composable("ChildModeSettingsPage") {
                             ChildModeSettingsPage(navController)
                         }
-                        composable("HomePage") {
-                            ParentHomePage(navController)
+                        composable("ChatBotPage") {
+                            ChatBotPage(navController)
+                        }
+                        composable("ParentInsightsPage") {
+                            ParentInsightsPage(navController)
+                        }
+                        composable("DailySurveyPage") {
+                            DailySurveyPage(navController)
                         }
                         composable("SpecialistsPage") {
                             SpecialistsPage(navController)
                         }
-                        composable("ChildModulePage") {
-                            ChildModulePage(navController)
-                        }
-                        composable("ChildPracticePage") {
-                            ChildPracticePage(navController)
-                        }
                         composable("ChildGamesPage") {
                             ChildGamesPage(navController)
                         }
-                        composable("ChildProgramPage") {
-                            ChildProgramPage(navController)
+                        composable("ModuleOneGamesPage") {
+                            ModuleOneGamesPage(navController)
+                        }
+                        composable("DailyRoutineGamePage") {
+                            DailyRoutineGamePage(navController)
+                        }
+                        composable("EmotionGamePage") {
+                            EmotionGamePage(navController)
+                        }
+                        composable("AssembleAnimalGamePage") {
+                            AssembleAnimalGameCalibratedPage(navController)
+                        }
+                        composable("DrawTriangleSquareGamePage") {
+                            DrawTriangleSquareGamePage(navController)
+                        }
+                        composable("ColorFinderGamePage") {
+                            ColorFinderGamePage(navController)
+                        }
+                        composable("CountingGamePage") {
+                            CountingGamePage(navController)
+                        }
+                        composable("GuessSoundGamePage") {
+                            GuessSoundGamePage(navController)
+                        }
+                        composable("UpDownGamePage") {
+                            UpDownGamePage(navController)
                         }
                         composable("SpecialistCoursesPage") {
                             SpecialistCoursesPage(navController)
                         }
-                        composable("CourseDetailsPage") {
-                            CourseDetailsPage(navController)
+                        composable(
+                            "CourseDetailsPage/{courseId}?mode={mode}",
+                            arguments = listOf(navArgument("courseId") {
+                                type = NavType.IntType
+                                defaultValue = 1
+                            }, navArgument("mode") {
+                                type = NavType.StringType
+                                defaultValue = "parent"
+                            })
+                        ) { backStackEntry ->
+                            val courseId = backStackEntry.arguments?.getInt("courseId") ?: 1
+                            val mode = backStackEntry.arguments?.getString("mode") ?: "parent"
+                            CourseDetailsPage(navController, courseId, mode)
                         }
                         composable("CreateCoursePage") {
                             CreateCoursePage(navController)
                         }
-
-
+                        composable("CourseSearchPage") {
+                            CourseSearchPage(navController, courseFilters)
+                        }
+                        composable("SearchResultsPage/{query}") { backStackEntry ->
+                            val query = backStackEntry.arguments?.getString("query") ?: ""
+                            SearchResultsPage(navController, query, courseFilters)
+                        }
+                        composable("CourseFilterPage") {
+                            CourseFilterPage(navController, courseFilters)
+                        }
+                        composable("SpecialistSearchPage") {
+                            SpecialistSearchPage(navController)
+                        }
+                        composable("SpecialistSearchResultsPage/{query}") { backStackEntry ->
+                            val query = backStackEntry.arguments?.getString("query") ?: ""
+                            SpecialistSearchResultsPage(navController, query)
+                        }
+                        composable(
+                            "SpecialistProfilePage/{specialistId}",
+                            arguments = listOf(navArgument("specialistId") {
+                                type = NavType.IntType
+                                defaultValue = 1
+                            })
+                        ) { backStackEntry ->
+                            val specialistId = backStackEntry.arguments?.getInt("specialistId") ?: 1
+                            SpecialistProfilePage(navController, specialistId)
+                        }
+                        composable("CartPage") {
+                            CartPage(navController)
+                        }
+                        composable("FavoritesPage") {
+                            FavoritesPage(navController)
+                        }
 
                     }
                 }
@@ -178,11 +335,14 @@ class MainActivity : ComponentActivity() {
 //@Preview(showBackground = true)
 //@Composable
 //fun DefaultPreview() {
-//    val navController = rememberNavController()  // Создаем NavController
+//    val navController = rememberNavController()  // РЎРѕР·РґР°РµРј NavController
 //    MaterialTheme {
-//        LoginScreen(navController = navController) // Передаем его в LoginScreen
+//        LoginScreen(navController = navController) // РџРµСЂРµРґР°РµРј РµРіРѕ РІ LoginScreen
 //    }
 //}
+
+
+
 
 
 
