@@ -1,6 +1,6 @@
 @file:OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -66,10 +66,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import android.provider.OpenableColumns
 import android.util.Log
-import com.example.diploma.data.remote.ApiClient
-import com.example.diploma.data.remote.ChoiceItem
-import com.example.diploma.data.remote.RefreshRequest
-import com.example.diploma.data.remote.TokenStorage
+import kz.aruzhan.care_steps.data.remote.ApiClient
+import kz.aruzhan.care_steps.data.remote.ChoiceItem
+import kz.aruzhan.care_steps.data.remote.RefreshRequest
+import kz.aruzhan.care_steps.data.remote.TokenStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -188,7 +188,7 @@ fun CreateCoursePage(navController: NavController) {
                             MultipartBody.Part.createFormData("tags", tag)
                         }
 
-                        suspend fun doCreateCourse(): Result<com.example.diploma.data.remote.CreatedCourseResponse> = try {
+                        suspend fun doCreateCourse(): Result<kz.aruzhan.care_steps.data.remote.CreatedCourseResponse> = try {
                             val response = withContext(Dispatchers.IO) {
                                 Log.i("CreateCourse", "POST /api/courses/ tags=${selectedTags.toList()}")
                                 val previewPart = buildPreviewImagePart(context, uri)
@@ -208,7 +208,7 @@ fun CreateCoursePage(navController: NavController) {
                             Result.success(response)
                         } catch (e: java.net.ProtocolException) {
                             Log.w("CreateCourse", "Course created (201) but response body truncated by server", e)
-                            val stub = com.example.diploma.data.remote.CreatedCourseResponse(
+                            val stub = kz.aruzhan.care_steps.data.remote.CreatedCourseResponse(
                                 id = -1, title = title.trim(), description = description.trim(),
                                 category = selectedCategory, level = selectedLevelValue,
                                 price = priceStr, duration = durationInt,

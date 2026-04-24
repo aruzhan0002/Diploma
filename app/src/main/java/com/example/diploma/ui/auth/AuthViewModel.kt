@@ -1,10 +1,10 @@
-package com.example.diploma.ui.auth
+package kz.aruzhan.care_steps.ui.auth
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.diploma.data.remote.*
-import com.example.diploma.domain.model.ParentRelationship
+import kz.aruzhan.care_steps.data.remote.*
+import kz.aruzhan.care_steps.domain.model.ParentRelationship
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject

@@ -1,4 +1,4 @@
-package com.example.diploma.data.remote
+package kz.aruzhan.care_steps.data.remote
 
 import kotlinx.coroutines.delay
 import okhttp3.Interceptor

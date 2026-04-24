@@ -1,6 +1,6 @@
-package com.example.diploma.data.remote
+package kz.aruzhan.care_steps.data.remote
 
-import com.example.diploma.SearchableCourse
+import kz.aruzhan.care_steps.SearchableCourse
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName

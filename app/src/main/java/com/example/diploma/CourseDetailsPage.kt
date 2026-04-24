@@ -1,6 +1,6 @@
 @file:OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import android.content.Intent
 import android.net.Uri
@@ -46,17 +46,17 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.example.diploma.data.remote.CourseCardResponse
-import com.example.diploma.data.remote.CourseContentResponse
-import com.example.diploma.data.remote.CourseDescriptionResponse
-import com.example.diploma.data.remote.CourseSpecialistResponse
-import com.example.diploma.data.remote.learningOutcomesList
-import com.example.diploma.data.remote.specialistRoleSubtitle
-import com.example.diploma.data.remote.specializationsForDescription
-import com.example.diploma.data.remote.tagLabels
-import com.example.diploma.data.remote.ApiClient
-import com.example.diploma.data.remote.CourseContentModuleResponse
-import com.example.diploma.data.remote.PartialCourseUpdateRequest
+import kz.aruzhan.care_steps.data.remote.CourseCardResponse
+import kz.aruzhan.care_steps.data.remote.CourseContentResponse
+import kz.aruzhan.care_steps.data.remote.CourseDescriptionResponse
+import kz.aruzhan.care_steps.data.remote.CourseSpecialistResponse
+import kz.aruzhan.care_steps.data.remote.learningOutcomesList
+import kz.aruzhan.care_steps.data.remote.specialistRoleSubtitle
+import kz.aruzhan.care_steps.data.remote.specializationsForDescription
+import kz.aruzhan.care_steps.data.remote.tagLabels
+import kz.aruzhan.care_steps.data.remote.ApiClient
+import kz.aruzhan.care_steps.data.remote.CourseContentModuleResponse
+import kz.aruzhan.care_steps.data.remote.PartialCourseUpdateRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

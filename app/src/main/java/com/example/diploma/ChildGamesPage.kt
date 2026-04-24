@@ -1,4 +1,4 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import android.media.MediaPlayer
 import androidx.compose.foundation.Image

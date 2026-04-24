@@ -1,4 +1,4 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.diploma.ui.child.ChildViewModel
+import kz.aruzhan.care_steps.ui.child.ChildViewModel
 
 @Composable
 fun AccountCreateFifthPage(navController: NavController, childVm: ChildViewModel) {

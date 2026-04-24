@@ -1,4 +1,4 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import androidx.compose.material3.Text
 import androidx.compose.ui.unit.sp

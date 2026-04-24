@@ -1,12 +1,12 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.example.diploma.data.remote.CourseCardResponse
-import com.example.diploma.data.remote.CreatedCourseResponse
-import com.example.diploma.data.remote.SpecialistCardResponse
-import com.example.diploma.data.remote.SpecialistDetailResponse
+import kz.aruzhan.care_steps.data.remote.CourseCardResponse
+import kz.aruzhan.care_steps.data.remote.CreatedCourseResponse
+import kz.aruzhan.care_steps.data.remote.SpecialistCardResponse
+import kz.aruzhan.care_steps.data.remote.SpecialistDetailResponse
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser

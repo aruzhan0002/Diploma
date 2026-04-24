@@ -1,4 +1,4 @@
-package com.example.diploma.data.remote
+package kz.aruzhan.care_steps.data.remote
 
 import android.content.Context
 import android.content.SharedPreferences

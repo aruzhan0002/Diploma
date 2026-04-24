@@ -1,4 +1,4 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,9 +33,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.example.diploma.data.remote.ApiClient
-import com.example.diploma.data.remote.CourseCardResponse
-import com.example.diploma.data.remote.SpecialistDetailResponse
+import kz.aruzhan.care_steps.data.remote.ApiClient
+import kz.aruzhan.care_steps.data.remote.CourseCardResponse
+import kz.aruzhan.care_steps.data.remote.SpecialistDetailResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch

@@ -1,8 +1,8 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import android.content.Context
 import android.util.Base64
-import com.example.diploma.data.remote.TokenStorage
+import kz.aruzhan.care_steps.data.remote.TokenStorage
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat

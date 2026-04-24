@@ -1,4 +1,4 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

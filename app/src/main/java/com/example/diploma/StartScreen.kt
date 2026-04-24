@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.diploma.R
+import kz.aruzhan.care_steps.R
 
 @Composable
 fun StartScreen(navController: NavController) {

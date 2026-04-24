@@ -1,4 +1,4 @@
-package com.example.diploma.ui.auth
+package kz.aruzhan.care_steps.ui.auth
 
 import android.app.Application
 import androidx.compose.runtime.getValue
@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.diploma.data.remote.*
+import kz.aruzhan.care_steps.data.remote.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject

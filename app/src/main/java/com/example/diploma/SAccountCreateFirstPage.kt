@@ -1,4 +1,4 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,8 +20,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.diploma.R
-import com.example.diploma.ui.auth.SpecialistViewModel
+import kz.aruzhan.care_steps.R
+import kz.aruzhan.care_steps.ui.auth.SpecialistViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

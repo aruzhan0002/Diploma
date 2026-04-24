@@ -1,4 +1,4 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -44,9 +44,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.diploma.data.remote.ApiClient
-import com.example.diploma.data.remote.MoodTrackingSummaryResponse
-import com.example.diploma.data.remote.TokenStorage
+import kz.aruzhan.care_steps.data.remote.ApiClient
+import kz.aruzhan.care_steps.data.remote.MoodTrackingSummaryResponse
+import kz.aruzhan.care_steps.data.remote.TokenStorage
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -450,12 +450,12 @@ private fun WeekStateCard(
     }
 }
 
-private fun com.example.diploma.data.remote.MoodQualitySummary?.toCardText(defaultText: String): String {
+private fun kz.aruzhan.care_steps.data.remote.MoodQualitySummary?.toCardText(defaultText: String): String {
     if (this == null) return defaultText
     return summaryRu ?: defaultText
 }
 
-private fun com.example.diploma.data.remote.MoodQualitySummary?.toCardColor(defaultColor: Color): Color {
+private fun kz.aruzhan.care_steps.data.remote.MoodQualitySummary?.toCardColor(defaultColor: Color): Color {
     if (this == null) return defaultColor
     return when (summaryKey) {
         "good" -> Color(0xFF76B82A)
@@ -464,7 +464,7 @@ private fun com.example.diploma.data.remote.MoodQualitySummary?.toCardColor(defa
     }
 }
 
-private fun com.example.diploma.data.remote.MoodDonutSummary?.toDonutSweeps(): Triple<Float, Float, Float> {
+private fun kz.aruzhan.care_steps.data.remote.MoodDonutSummary?.toDonutSweeps(): Triple<Float, Float, Float> {
     if (this == null) return Triple(250f, 70f, 40f)
     val g = (goodPct ?: 0f).coerceAtLeast(0f)
     val n = (mediumPct ?: 0f).coerceAtLeast(0f)

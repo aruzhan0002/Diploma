@@ -1,4 +1,4 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import android.content.Context
 import androidx.compose.foundation.Image
@@ -46,8 +46,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import android.util.Log
-import com.example.diploma.data.remote.ApiClient
-import com.example.diploma.data.remote.ChatBotRequest
+import kz.aruzhan.care_steps.data.remote.ApiClient
+import kz.aruzhan.care_steps.data.remote.ChatBotRequest
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -146,7 +146,7 @@ private suspend fun sendChatWithFallback(message: String, sessionId: Int?): Chat
 }
 
 private sealed interface ChatBotResult {
-    data class Success(val response: com.example.diploma.data.remote.ChatBotResponse) : ChatBotResult
+    data class Success(val response: kz.aruzhan.care_steps.data.remote.ChatBotResponse) : ChatBotResult
     data class Failure(val error: Throwable?) : ChatBotResult
 }
 

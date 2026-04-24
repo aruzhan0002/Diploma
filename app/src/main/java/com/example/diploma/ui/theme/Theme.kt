@@ -1,4 +1,4 @@
-package com.example.diploma.ui.theme
+package kz.aruzhan.care_steps.ui.theme
 
 import android.app.Activity
 import android.os.Build

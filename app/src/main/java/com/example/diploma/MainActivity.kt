@@ -1,4 +1,4 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import LoginScreen
 import ForgotPasswordCodePage
@@ -22,9 +22,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.diploma.data.remote.TokenStorage
-import com.example.diploma.ui.auth.SpecialistViewModel
-import com.example.diploma.ui.child.ChildViewModel
+import kz.aruzhan.care_steps.data.remote.TokenStorage
+import kz.aruzhan.care_steps.ui.auth.SpecialistViewModel
+import kz.aruzhan.care_steps.ui.child.ChildViewModel
 
 
 class MainActivity : ComponentActivity() {

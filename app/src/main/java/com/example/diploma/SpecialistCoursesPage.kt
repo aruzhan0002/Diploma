@@ -1,6 +1,6 @@
 @file:OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -38,7 +38,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.example.diploma.data.remote.ApiClient
+import kz.aruzhan.care_steps.data.remote.ApiClient
 import org.json.JSONArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

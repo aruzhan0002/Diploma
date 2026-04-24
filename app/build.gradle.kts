@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.diploma"
+    namespace = "kz.aruzhan.care_steps"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.diploma"
+        applicationId = "kz.aruzhan.care_steps"
         minSdk = 23
         targetSdk = 36
         versionCode = 1

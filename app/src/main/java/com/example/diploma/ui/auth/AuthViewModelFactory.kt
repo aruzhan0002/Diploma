@@ -1,9 +1,9 @@
-package com.example.diploma.ui.auth
+package kz.aruzhan.care_steps.ui.auth
 
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.diploma.ui.auth.AuthViewModel
+import kz.aruzhan.care_steps.ui.auth.AuthViewModel
 
 class AuthViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

@@ -1,4 +1,4 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import android.net.Uri
 import android.provider.OpenableColumns
@@ -50,11 +50,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.example.diploma.data.remote.ApiClient
-import com.example.diploma.data.remote.ChangePasswordRequest
-import com.example.diploma.data.remote.CreateChildRequest
-import com.example.diploma.data.remote.ParentAddressRequest
-import com.example.diploma.data.remote.ProfileRequest
+import kz.aruzhan.care_steps.data.remote.ApiClient
+import kz.aruzhan.care_steps.data.remote.ChangePasswordRequest
+import kz.aruzhan.care_steps.data.remote.CreateChildRequest
+import kz.aruzhan.care_steps.data.remote.ParentAddressRequest
+import kz.aruzhan.care_steps.data.remote.ProfileRequest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody

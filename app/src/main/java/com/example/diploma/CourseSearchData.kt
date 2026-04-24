@@ -1,6 +1,6 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
-import com.example.diploma.data.remote.ApiClient
+import kz.aruzhan.care_steps.data.remote.ApiClient
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf

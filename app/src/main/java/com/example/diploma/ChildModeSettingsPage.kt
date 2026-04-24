@@ -1,6 +1,6 @@
 @file:OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

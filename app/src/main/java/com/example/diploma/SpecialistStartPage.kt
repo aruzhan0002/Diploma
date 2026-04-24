@@ -1,4 +1,4 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import LoginScreen
 import androidx.compose.foundation.Image

@@ -1,6 +1,6 @@
-package com.example.diploma.data.repository
+package kz.aruzhan.care_steps.data.repository
 
-import com.example.diploma.data.remote.*
+import kz.aruzhan.care_steps.data.remote.*
 
 class AuthRepository(
     private val api: ApiService

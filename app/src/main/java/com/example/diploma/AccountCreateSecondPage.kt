@@ -1,4 +1,4 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import android.app.Application
 import android.content.Context
@@ -29,9 +29,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.diploma.domain.model.ParentRelationship
-import com.example.diploma.ui.auth.AuthViewModel
-import com.example.diploma.ui.auth.AuthViewModelFactory
+import kz.aruzhan.care_steps.domain.model.ParentRelationship
+import kz.aruzhan.care_steps.ui.auth.AuthViewModel
+import kz.aruzhan.care_steps.ui.auth.AuthViewModelFactory
 
 @Composable
 fun RelationshipSelector(

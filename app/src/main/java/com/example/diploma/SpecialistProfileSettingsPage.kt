@@ -1,4 +1,4 @@
-package com.example.diploma
+package kz.aruzhan.care_steps
 
 import android.net.Uri
 import android.provider.OpenableColumns
@@ -55,8 +55,8 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.google.gson.JsonElement
-import com.example.diploma.data.remote.ApiClient
-import com.example.diploma.data.remote.ChangePasswordRequest
+import kz.aruzhan.care_steps.data.remote.ApiClient
+import kz.aruzhan.care_steps.data.remote.ChangePasswordRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

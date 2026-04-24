@@ -1,4 +1,4 @@
-package com.example.diploma.data.remote
+package kz.aruzhan.care_steps.data.remote
 
 import okhttp3.MultipartBody
 import okhttp3.RequestBody

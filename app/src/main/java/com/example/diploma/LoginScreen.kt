@@ -23,9 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.diploma.R
-import com.example.diploma.ui.auth.AuthViewModel
-import com.example.diploma.ui.auth.AuthViewModelFactory
+import kz.aruzhan.care_steps.R
+import kz.aruzhan.care_steps.ui.auth.AuthViewModel
+import kz.aruzhan.care_steps.ui.auth.AuthViewModelFactory
 
 @Composable
 fun LoginScreen(navController: NavController, role: String = "specialist") {

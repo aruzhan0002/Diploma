@@ -1,8 +1,8 @@
-package com.example.diploma.ui.child
+package kz.aruzhan.care_steps.ui.child
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.diploma.data.remote.*
+import kz.aruzhan.care_steps.data.remote.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
