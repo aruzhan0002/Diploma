@@ -40,7 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kz.aruzhan.care_steps.ui.child.ChildViewModel
-import kz.aruzhan.care_steps.StepProgressBar
+
 
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -85,7 +85,6 @@ fun AccountCreateEighthPage(navController: NavController, childVm: ChildViewMode
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
-                // важно: снизу место под закреплённые кнопки
                 .padding(bottom = 140.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

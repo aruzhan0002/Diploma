@@ -37,11 +37,9 @@ interface ApiService {
     @GET("api/courses/public/cards/{course_id}/content/")
     suspend fun getCourseContent(@Path("course_id") courseId: Int): CourseContentResponse
 
-    /** Raw-вариант публичного content, чтобы родитель мог вытащить file даже если Gson не распарсил. */
     @GET("api/courses/public/cards/{course_id}/content/")
     suspend fun getCourseContentRaw(@Path("course_id") courseId: Int): okhttp3.ResponseBody
 
-    /** Raw-вариант приватного content (для fallback'ов с нестандартными именами полей). */
     @GET("api/courses/{id}/content/")
     suspend fun getSpecialistCourseContentRaw(@Path("id") id: Int): okhttp3.ResponseBody
 

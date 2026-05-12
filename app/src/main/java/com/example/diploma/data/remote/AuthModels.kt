@@ -11,7 +11,6 @@ data class RegisterRequest(
 )
 
 data class LoginRequest(
-    // Backend auth endpoint expects `username` field even for email login.
     @SerializedName("username") val email: String,
     val password: String
 )
